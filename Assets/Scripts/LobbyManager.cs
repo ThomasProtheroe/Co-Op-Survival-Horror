@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class LobbyManager : MonoBehaviourPunCallbacks
+public class LobbyManager : MonoBehaviourPunCallbacks, IPunObservable
 {
     #region Private Fields
 
@@ -26,6 +26,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     private GameObject startButton;
     [SerializeField]
     private GameObject lobbyTitle;
+    [SerializeField]
+    private GameObject readyRequestText;
     [SerializeField]
     private List<PlayerLobbyInfo> lobbySlots;
     
@@ -60,6 +62,16 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
     }
 
+
+    #region IPunObservable implementation
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
+
+    }
+
+    #endregion
+
+
     public void readyClick() {
         if (!localSlot.getIsReady()) {
             readyButton.GetComponent<Image> ().color = new Color32(126,255,126,100);
@@ -77,8 +89,22 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     }
 
     public void startClick() {
-        //Check Ready status of all players
+        if (!PhotonNetwork.IsMasterClient) {
+            //Only master client should be able to start the game
+            return;
+        }
 
+        localSlot.setReady(true);
+
+        //Check Ready status of all players
+        foreach (PlayerLobbyInfo slot in lobbySlots) {
+            if (slot.hasPlayer() && !slot.getIsReady()) {
+                photonView.RPC("displayReadyRequest", RpcTarget.AllBuffered);
+                return;
+            }
+        }
+
+        LoadRandomLevel();
     }
 
     public void leaveClick() {
@@ -94,7 +120,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         PhotonNetwork.LeaveRoom();
     }
 
-    public void LoadRandomLevel()
+    private void LoadRandomLevel()
     {
         if (!PhotonNetwork.IsMasterClient)
         {
@@ -103,6 +129,16 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         Debug.LogFormat("PhotonNetwork : Loading Level : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
         PhotonNetwork.LoadLevel("RandomLevel");
     }
+
+
+    #region Pun RPCs
+
+    [PunRPC]
+    void displayReadyRequest() {
+        readyRequestText.GetComponent<Text> ().enabled = true;
+    }
+
+    #endregion
 
 
     #region Photon Callbacks

@@ -66,6 +66,10 @@ public class PlayerLobbyInfo : MonoBehaviourPunCallbacks, IPunObservable
         return isReady;
     }
 
+    public void setReady(bool _ready) {
+        isReady = _ready;
+    }
+
 
     #region Pun RPCs
 
@@ -73,6 +77,7 @@ public class PlayerLobbyInfo : MonoBehaviourPunCallbacks, IPunObservable
     void updatePlayerInfo(Player _player) {
         player = _player;
         playerNameText.GetComponent<Text> ().text = _player.NickName;
+
     }
 
     [PunRPC]
