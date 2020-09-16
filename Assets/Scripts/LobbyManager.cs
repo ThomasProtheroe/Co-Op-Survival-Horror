@@ -27,6 +27,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     private GameObject startButton;
     [SerializeField]
     private GameObject lobbyTitle;
+    [SerializeField]
+    private List<PlayerLobbyInfo> lobbySlots;
     
     #endregion
 
@@ -34,7 +36,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     #region Private References
 
     private List<Player> playerList;
-    private List<PlayerLobbyInfo> lobbySlots;
 
     #endregion
 
@@ -44,12 +45,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         //Initialize references/fields
         playerList = new List<Player> (PhotonNetwork.PlayerList);
-        lobbySlots = new List<PlayerLobbyInfo> ();
-
-        //Load player names
-        foreach(GameObject slot in GameObject.FindGameObjectsWithTag("PlayerLobbyInfo")) {
-            lobbySlots.Add(slot.GetComponent<PlayerLobbyInfo> ());
-        }
 
         lobbySlots[playerList.IndexOf(PhotonNetwork.LocalPlayer)].loadPlayer();
 
@@ -78,7 +73,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
     }
 
-     public void startClick() {
+    public void startClick() {
         if (!isReady) {
             isReady = true;
             readyButton.GetComponent<Image> ().color = new Color32(126,255,126,100);
@@ -86,6 +81,10 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             isReady = false;
             readyButton.GetComponent<Image> ().color = new Color32(255,255,255,100);
         }
+    }
+
+    public void leaveClick() {
+        LeaveRoom();
     }
 
     public void sendLobbyMessage(string message) {
