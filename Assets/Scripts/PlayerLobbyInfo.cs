@@ -9,7 +9,8 @@ using Photon.Realtime;
 
 public class PlayerLobbyInfo : MonoBehaviourPunCallbacks, IPunObservable
 {
-    private int playerNumber;
+    private Player player;
+    private bool isReady;
 
     [SerializeField]
     private GameObject playerNameText;
@@ -40,7 +41,7 @@ public class PlayerLobbyInfo : MonoBehaviourPunCallbacks, IPunObservable
 
 
     public void loadPlayer() {
-        //Load the player info for other clients
+        //Load the player info for all clients
         photonView.RPC("updatePlayerInfo", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
     }
 
@@ -49,12 +50,38 @@ public class PlayerLobbyInfo : MonoBehaviourPunCallbacks, IPunObservable
         playerReadyText.GetComponent<Text> ().text = null;
     }
 
+    public void toggleReadyStatus() {
+        isReady = !isReady; 
+        photonView.RPC("updatePlayerReadyStatus", RpcTarget.AllBuffered, isReady);
+    }
+
+    public bool hasPlayer() {
+        if (player != null) {
+            return true;
+        }
+        return false;
+    }
+
+    public bool getIsReady() {
+        return isReady;
+    }
+
 
     #region Pun RPCs
 
     [PunRPC]
-    void updatePlayerInfo(Player player) {
-        playerNameText.GetComponent<Text> ().text = player.NickName;
+    void updatePlayerInfo(Player _player) {
+        player = _player;
+        playerNameText.GetComponent<Text> ().text = _player.NickName;
+    }
+
+    [PunRPC]
+    void updatePlayerReadyStatus(bool ready) {
+        if (ready) {
+            playerReadyText.GetComponent<Text> ().enabled = true;
+        } else {
+            playerReadyText.GetComponent<Text> ().enabled = false;
+        }
     }
 
     #endregion

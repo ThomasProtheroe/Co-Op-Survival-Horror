@@ -12,7 +12,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 {
     #region Private Fields
 
-    private bool isReady;
 
     #endregion
 
@@ -35,6 +34,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     #region Private References
 
+    private PlayerLobbyInfo localSlot;
     private List<Player> playerList;
 
     #endregion
@@ -45,8 +45,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         //Initialize references/fields
         playerList = new List<Player> (PhotonNetwork.PlayerList);
+        localSlot = lobbySlots[playerList.IndexOf(PhotonNetwork.LocalPlayer)];
 
-        lobbySlots[playerList.IndexOf(PhotonNetwork.LocalPlayer)].loadPlayer();
+        localSlot.loadPlayer();
 
         //Show the lobby title
         lobbyTitle.GetComponent<Text> ().text = PhotonNetwork.CurrentRoom.Name;
@@ -60,27 +61,24 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     }
 
     public void readyClick() {
-        if (!isReady) {
-            isReady = true;
+        if (!localSlot.getIsReady()) {
             readyButton.GetComponent<Image> ().color = new Color32(126,255,126,100);
         } else {
-            isReady = false;
             readyButton.GetComponent<Image> ().color = new Color32(255,255,255,100);
         }
 
+        localSlot.toggleReadyStatus();
+
+        /*
         foreach (Player player in playerList) {
             Debug.Log("Player " + playerList.IndexOf(player) + " - " + player.NickName);
         }
+        */
     }
 
     public void startClick() {
-        if (!isReady) {
-            isReady = true;
-            readyButton.GetComponent<Image> ().color = new Color32(126,255,126,100);
-        } else {
-            isReady = false;
-            readyButton.GetComponent<Image> ().color = new Color32(255,255,255,100);
-        }
+        //Check Ready status of all players
+
     }
 
     public void leaveClick() {
