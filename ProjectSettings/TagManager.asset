@@ -9,6 +9,8 @@ TagManager:
   - PlayerSpawn
   - PlayerLobbyInfo
   - LobbyPlayerSlot
+  - HealthBar
+  - StaminaBar
   layers:
   - Default
   - TransparentFX

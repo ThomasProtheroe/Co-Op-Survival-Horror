@@ -33,6 +33,16 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     #endregion
 
 
+    #region Private Serializable References
+
+    [SerializeField]
+    private GameObject healthBar;
+    [SerializeField]
+    private GameObject staminaBar;
+
+    #endregion
+
+
     #region Private References
 
     private Rigidbody2D rigidBody;
@@ -40,12 +50,6 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 
     #endregion
 
-
-    #region Private Serializable References
-
-    
-
-    #endregion
 
 
     #region Private Fields
@@ -99,6 +103,9 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         if (photonView.IsMine == true) {
             //Follow with camera
             cameraController.startFollowing(gameObject);
+
+            //Link to health/stamina bars
+            healthBar = GameObject.FindGameObjectWithTag("HealthBar");
         }
     }
 
@@ -260,6 +267,9 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+
+    #region Helpers
+
     private void stopMovement() {
         rigidBody.velocity = new Vector2 (0.0f, 0.0f);
     }
@@ -275,18 +285,48 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 		transform.localScale = theScale;
 	}
 
+    private void endLandingStagger() {
+        canMove = true;
+    }
+
+    private void takeDamage(int damage) {
+        currentHp -= damage;
+
+        updateHealthBar();
+
+        if (currentHp <= 0) {
+            killSurvivor();
+        }
+    }
+
+    private void killSurvivor() {
+
+    }
+
+    private void updateHealthBar() {
+        healthBar.GetComponent<Image> ().fillAmount = currentHp / maxHp;
+    }
+
+    #endregion
+
+
+    #region custom event handling
+
     private void onLanding() {
         stopMovement();
         landingStaggerTimer = landingStaggerTime;
         canMove = false;
     }
 
-    private void endLandingStagger() {
-        canMove = true;
-    }
+    #endregion
+
+
+    #region getters/setters
 
     //Getters/Setters
     public Vector2 getVelocity() {
         return rigidBody.velocity;
     }
+
+    #endregion
 }
