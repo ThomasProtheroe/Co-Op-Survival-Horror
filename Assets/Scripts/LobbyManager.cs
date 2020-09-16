@@ -20,6 +20,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     #region Private Serializable References
     
     [SerializeField]
+    private GameObject playerInfoPrefab;
+    [SerializeField]
     private GameObject readyButton;
     [SerializeField]
     private GameObject startButton;
@@ -32,7 +34,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     #region Private References
 
     private List<Player> playerList;
-    private List<PlayerLobbyInfo> playerInfoList;
+    private List<PlayerLobbyInfo> lobbySlots;
 
     #endregion
 
@@ -42,8 +44,14 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         //Initialize references/fields
         playerList = new List<Player> (PhotonNetwork.PlayerList);
-        playerInfoList = new List<
+        lobbySlots = new List<PlayerLobbyInfo> ();
 
+        //Load player names
+        foreach(GameObject slot in GameObject.FindGameObjectsWithTag("PlayerLobbyInfo")) {
+            lobbySlots.Add(slot.GetComponent<PlayerLobbyInfo> ());
+        }
+
+        lobbySlots[playerList.IndexOf(PhotonNetwork.LocalPlayer)].loadPlayer();
 
         //Show the lobby title
         lobbyTitle.GetComponent<Text> ().text = PhotonNetwork.CurrentRoom.Name;
@@ -64,6 +72,10 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             isReady = false;
             readyButton.GetComponent<Image> ().color = new Color32(255,255,255,100);
         }
+
+        foreach (Player player in playerList) {
+            Debug.Log("Player " + playerList.IndexOf(player) + " - " + player.NickName);
+        }
     }
 
      public void startClick() {
@@ -83,7 +95,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public void LeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
-
     }
 
     public void LoadRandomLevel()

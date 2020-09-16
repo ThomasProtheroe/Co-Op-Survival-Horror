@@ -98,7 +98,6 @@ public class LobbyLauncher : MonoBehaviourPunCallbacks
     }
 
     private void CreateRoom() {
-        Debug.Log(hostedLobbyField.GetComponent<InputField> ().text);
         PhotonNetwork.CreateRoom(hostedLobbyField.GetComponent<InputField> ().text, new RoomOptions{ MaxPlayers = maxPlayersPerRoom });
     }
 
