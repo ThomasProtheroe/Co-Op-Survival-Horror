@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.UI;
 
 using Photon.Pun;
 using Photon.Realtime;
@@ -12,17 +13,31 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     #region Private Serializable Fields
 
     [SerializeField]
-    private float moveSpeed;
-    [SerializeField]
     private int maxHp;
     [SerializeField]
-    private int maxStamina;
+    private float maxStamina;
+    [SerializeField]
+    private float staminaRecoveryDelay;
+    [SerializeField]
+    private float staminaRecoveryRate;
+    [SerializeField]
+    private float jumpStaminaUsage;
+    [SerializeField]
+    private float sprintStaminaUsage;
+    [SerializeField]
+    private float moveSpeed;
     [SerializeField]
     private float sprintMultiplier;
+    [SerializeField]
+    private float aimSpeedMultiplier;
     [SerializeField]
     private float fallMultiplier;
     [SerializeField]
     private float fallControlSpeed;
+    [SerializeField]
+    private float fallDamageThreshold;
+    [SerializeField]
+    private float baseFallDamage;
     [SerializeField]
     private float verticalJumpStrength;
     [SerializeField]
@@ -57,7 +72,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     //Player attributes
     private Vector2 velocity;
     private int currentHp;
-    private int currentStamina;
+    private float currentStamina;
     private float currentMoveSpeed;
 
     //Condition flags
@@ -65,6 +80,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     private bool canAct = true;
     private bool grounded = true;
     private bool sprinting = false;
+    private bool recoveringStamina;
     private bool facingRight = true;
 
     //Inputs
@@ -73,9 +89,18 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     private bool inputJump;
     private bool inputSprint;
     private bool inputDown;
+    private bool inputAim;
 
     //Timers
     private float landingStaggerTimer;
+    private float staminaRecoveryTimer;
+
+    #endregion
+
+
+    #region Gear
+
+
 
     #endregion
 
@@ -98,6 +123,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 
         //Set starting stats
         currentHp = maxHp;
+        currentStamina = maxStamina;
         currentMoveSpeed = moveSpeed;
 
         if (photonView.IsMine == true) {
@@ -106,6 +132,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 
             //Link to health/stamina bars
             healthBar = GameObject.FindGameObjectWithTag("HealthBar");
+            staminaBar = GameObject.FindGameObjectWithTag("StaminaBar");
         }
     }
 
@@ -121,19 +148,9 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         if (photonView.IsMine == false && PhotonNetwork.IsConnected == true) {
             return;
-        }
-
-        //Handle all timers
-        if (landingStaggerTimer > 0f) {
-            landingStaggerTimer -= Time.deltaTime;
-            if (landingStaggerTimer <= 0f) {
-                landingStaggerTimer = 0f;
-                endLandingStagger();
-            } 
         }
 
         //Player input and movement
@@ -150,12 +167,39 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         if (photonView.IsMine == false && PhotonNetwork.IsConnected == true) {
             return;
         }
+
+        //Handle all timers
+        if (landingStaggerTimer > 0f) {
+            landingStaggerTimer -= Time.deltaTime;
+            if (landingStaggerTimer <= 0f) {
+                landingStaggerTimer = 0f;
+                endLandingStagger();
+            } 
+        }
+
+        if (staminaRecoveryTimer > 0f) {
+            staminaRecoveryTimer -= Time.deltaTime;
+            if (staminaRecoveryTimer <= 0f) {
+                staminaRecoveryTimer = 0f;
+                startStaminaRecovery();
+            } 
+        }
         
         //More responsive jumps
         if (rigidBody.velocity.y < 0) {
             rigidBody.gravityScale = fallMultiplier;
         } else {
             rigidBody.gravityScale = 1.4f;
+        }
+
+        //Stamina recovery
+        if (recoveringStamina) {
+            currentStamina += staminaRecoveryRate * Time.deltaTime;
+            updateStaminaBar();
+            if (currentStamina >= maxStamina) {
+                currentStamina = maxStamina;
+                recoveringStamina = false;
+            }
         }
     }
 
@@ -181,7 +225,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         //Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxCollider.size, 0);
 
         if (grounded) {
-            if (other.gameObject.tag == "Terrain") {
+            if (other.gameObject.tag == "Terrain" || other.gameObject.tag == "Platform") {
                 grounded = false;
             }
         }
@@ -226,9 +270,12 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
                     velocity.x = 0.0f;
                 }
                 //Sprinting
-                if (inputSprint) {
-                    sprinting = true;
-                    velocity.x = velocity.x * sprintMultiplier;
+                if (velocity.x != 0.0f && inputSprint) {
+                    if (currentStamina > 0.0f) {
+                        sprinting = true;
+                        velocity.x = velocity.x * sprintMultiplier;
+                    }
+                    reduceStamina(sprintStaminaUsage * Time.deltaTime);
                 }
             } else {
                 //Limit player control while airborn
@@ -240,7 +287,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
             }
 
             //Jumping
-            if (grounded && inputJump) {
+            if (grounded && inputJump && (currentStamina > 0.0f)) {
                 grounded = false;
                 //Upward jump velocity
                 rigidBody.velocity = new Vector2 (rigidBody.velocity.x, verticalJumpStrength);
@@ -249,6 +296,8 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
                 if (rigidBody.velocity.x != 0f) {
                     velocity.x = rigidBody.velocity.x * horizontalJumpStrength;
                 }
+                
+                reduceStamina(jumpStaminaUsage);
             }
 
             //Drop through platforms
@@ -267,8 +316,6 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-
-    #region Helpers
 
     private void stopMovement() {
         rigidBody.velocity = new Vector2 (0.0f, 0.0f);
@@ -289,6 +336,22 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         canMove = true;
     }
 
+    private void reduceStamina(float amount) {
+        recoveringStamina = false;
+        
+        currentStamina -= amount;
+        if (currentStamina < 0.0f) {
+            currentStamina = 0.0f;
+        }
+
+        updateStaminaBar();
+        startStaminaRecoveryTimer();
+    }
+
+    private void startStaminaRecovery() {
+        recoveringStamina = true;
+    }
+
     private void takeDamage(int damage) {
         currentHp -= damage;
 
@@ -300,11 +363,27 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     private void killSurvivor() {
-
+        Debug.Log("You're Dead.");
     }
 
+
+    #region Timer Helpers
+
+    private void startStaminaRecoveryTimer() {
+        staminaRecoveryTimer = staminaRecoveryDelay;
+    }
+
+    #endregion
+
+
+    #region GUI Update Helpers
+
     private void updateHealthBar() {
-        healthBar.GetComponent<Image> ().fillAmount = currentHp / maxHp;
+        healthBar.GetComponent<Image> ().fillAmount = (float)currentHp / (float)maxHp;
+    }
+
+    private void updateStaminaBar() {
+        staminaBar.GetComponent<Image> ().fillAmount = currentStamina / maxStamina;
     }
 
     #endregion
@@ -313,6 +392,10 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     #region custom event handling
 
     private void onLanding() {
+        if (System.Math.Abs(rigidBody.velocity.y) > fallDamageThreshold) {
+            takeDamage((int)(baseFallDamage * (System.Math.Abs(rigidBody.velocity.y) - fallDamageThreshold)));
+        }
+
         stopMovement();
         landingStaggerTimer = landingStaggerTime;
         canMove = false;

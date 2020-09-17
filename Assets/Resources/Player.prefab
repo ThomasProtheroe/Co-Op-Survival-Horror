@@ -171,12 +171,20 @@ MonoBehaviour:
   moveSpeed: 2
   maxHp: 100
   maxStamina: 100
+  staminaRecoveryDelay: 3
+  staminaRecoveryRate: 10
+  jumpStaminaUsage: 20
+  sprintStaminaUsage: 10
   sprintMultiplier: 1.6
   fallMultiplier: 2.8
   fallControlSpeed: 2
+  fallDamageThreshold: 12
+  baseFallDamage: 5
   verticalJumpStrength: 5
   horizontalJumpStrength: 1.4
   landingStaggerTime: 0.5
+  healthBar: {fileID: 0}
+  staminaBar: {fileID: 0}
 --- !u!114 &1673222894635344265
 MonoBehaviour:
   m_ObjectHideFlags: 0
