@@ -64,6 +64,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     private GameObject healthBar;
     private GameObject staminaBar;
     private Crosshair crosshair;
+    private Weapon currentWeapon;
 
     #endregion
 
@@ -94,6 +95,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     private bool inputDown;
     private bool inputAim;
     private bool inputAttack;
+    private bool inputReload;
 
     //Timers
     private float landingStaggerTimer;
@@ -103,8 +105,11 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 
 
     #region Gear
-
-
+    [Header("Gear")]
+    [SerializeField]
+    private Weapon weapon1;
+    [SerializeField]
+    private Weapon weapon2;
 
     #endregion
 
@@ -130,6 +135,8 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         currentHp = maxHp;
         currentStamina = maxStamina;
         currentMoveSpeed = moveSpeed;
+
+        currentWeapon = weapon1;
 
         if (photonView.IsMine == true) {
             //Follow with camera
@@ -268,6 +275,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         inputAim = Input.GetButton("Aim");
         inputSprint = Input.GetButton("Sprint");
         inputAttack = Input.GetButtonDown("Fire");
+        inputReload = Input.GetButtonDown("Reload");
     }
 
     private void executePlayerActions() {
@@ -281,6 +289,11 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         //Attacking
         if (inputAttack && grounded) {
             attack();
+        }
+
+        if (inputReload && grounded) {
+            stopAiming();
+            reloadWeapon();
         }
     }
 
@@ -363,39 +376,65 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     private void startAiming() {
+        if (aiming) {
+            return;
+        }
         aiming = true;
         crosshair.gameObject.GetComponent<SpriteRenderer> ().enabled = true;
     }
 
     private void stopAiming() {
+        if (!aiming) {
+            return;
+        }
         aiming = false;
         crosshair.gameObject.GetComponent<SpriteRenderer> ().enabled = false;
     }
 
     private void attack() {
-        //TODO check attack type
-        //Ranged attacks
-        if (!aiming) {
-            return;
+        if (currentWeapon.getWeaponType() == 1) {
+            //Ranged attacks
+            if (!aiming) {
+                return;
+            }
+            rangedAttack();
+        } else {
+            //Melee attacks
         }
-        rangedAttack();
-
-        //Melee attacks
     }
 
     private void rangedAttack() {
         //Animate the attack
         animator.SetBool("RangedAttack", true);
 
-        float range = Mathf.Infinity;
+        var weapon = (RangedWeapon)currentWeapon;
+        Attack attack = weapon.fireWeapon();
+        if (attack == null) {
+            Debug.Log("Gun empty!");
+            return;
+        }
+
         LayerMask mask = LayerMask.GetMask("Enemies", "Terrain");
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, crosshair.gameObject.transform.position - transform.position, range, mask);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, crosshair.gameObject.transform.position - transform.position, attack.range, mask);
         if (hit.collider != null) {
             GameObject targetHit = hit.collider.gameObject;
             if (targetHit.tag == "Enemy") {
-                targetHit.GetComponent<EnemyController> ().takeHit();
+                targetHit.GetComponent<EnemyController> ().takeHit(attack);
             }
         }
+        Debug.Log("Shot fired - " + weapon.getCurrentAmmo() + " rounds left in the magazine.");
+    }
+    
+    private void reloadWeapon() {
+        if (currentWeapon.getWeaponType() != 1) {
+            return;
+        }
+
+        animator.SetBool("Reload", true);
+
+        var weapon = (RangedWeapon)currentWeapon;
+        weapon.reloadWeapon();
+        Debug.Log("Reloaded - " + weapon.getcurrentReserveAmmo() + " rounds left in reserve.");
     }
 
     private void Flip()
