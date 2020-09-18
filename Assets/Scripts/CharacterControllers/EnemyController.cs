@@ -9,7 +9,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField]
     private int maxHp;
     [SerializeField]
-    private int baseArmor;
+    private float baseArmor;
     [SerializeField]
     private float moveSpeed;
     [SerializeField]
@@ -46,10 +46,15 @@ public class EnemyController : MonoBehaviour
     }
 
     private void takeDamage(Attack attack) {
-        currentHp -= attack.damage;
+        int modifiedDamage = (int)((float)attack.damage * (1.0f - (baseArmor / 100.0f)));
+        currentHp -= modifiedDamage;
 
         if (currentHp <= 0) {
-            Destroy(gameObject);
+            killEnemy();
         }
+    }
+
+    private void killEnemy() {
+        Destroy(gameObject);
     }
 }

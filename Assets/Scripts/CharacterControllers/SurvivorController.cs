@@ -77,6 +77,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     private int currentHp;
     private float currentStamina;
     private float currentMoveSpeed;
+    private float currentArmor;
 
     //Condition flags
     private bool canMove = true; //TODO - Create a PlayerStatus class to track status conditions such as stun, slowdown etc.
@@ -105,11 +106,14 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 
 
     #region Gear
+
     [Header("Gear")]
     [SerializeField]
     private Weapon weapon1;
     [SerializeField]
     private Weapon weapon2;
+    [SerializeField]
+    private Armor armor;
 
     #endregion
 
@@ -434,7 +438,6 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 
         var weapon = (RangedWeapon)currentWeapon;
         weapon.reloadWeapon();
-        Debug.Log("Reloaded - " + weapon.getcurrentReserveAmmo() + " rounds left in reserve.");
     }
 
     private void Flip()
@@ -469,7 +472,9 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     private void takeDamage(int damage) {
-        currentHp -= damage;
+        calculateCurrentArmor();
+        int modifiedDamage = (int)((float)damage * (1.0f - (currentArmor / 100.0f)));
+        currentHp -= modifiedDamage;
 
         updateHealthBar();
 
@@ -482,8 +487,15 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         Debug.Log("You're Dead.");
     }
 
+    private void calculateCurrentArmor() {
+        currentArmor = armor.getArmorValue();
+    }
+
     private void calculateCurrentMoveSpeed() {
         currentMoveSpeed = moveSpeed;
+        if (armor != null) {
+            currentMoveSpeed *= (1.0f - armor.getMoveSpeedModifier());
+        }
         if (aiming) {
             currentMoveSpeed *= aimSpeedMultiplier;
         }
