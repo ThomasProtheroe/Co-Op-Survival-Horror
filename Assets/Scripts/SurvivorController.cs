@@ -51,9 +51,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     #region Private Serializable References
 
     [SerializeField]
-    private GameObject healthBar;
-    [SerializeField]
-    private GameObject staminaBar;
+    private GameObject crosshairPrefab;
 
     #endregion
 
@@ -62,6 +60,10 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 
     private Rigidbody2D rigidBody;
     private CameraController cameraController;
+    private Animator animator;
+    private GameObject healthBar;
+    private GameObject staminaBar;
+    private Crosshair crosshair;
 
     #endregion
 
@@ -79,7 +81,8 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     private bool canMove = true; //TODO - Create a PlayerStatus class to track status conditions such as stun, slowdown etc.
     private bool canAct = true;
     private bool grounded = true;
-    private bool sprinting = false;
+    private bool aiming;
+    private bool sprinting;
     private bool recoveringStamina;
     private bool facingRight = true;
 
@@ -90,6 +93,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     private bool inputSprint;
     private bool inputDown;
     private bool inputAim;
+    private bool inputAttack;
 
     //Timers
     private float landingStaggerTimer;
@@ -120,6 +124,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         //Set references
         rigidBody = GetComponent<Rigidbody2D> ();
         cameraController = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController> ();
+        animator = GetComponent<Animator> ();
 
         //Set starting stats
         currentHp = maxHp;
@@ -130,9 +135,13 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
             //Follow with camera
             cameraController.startFollowing(gameObject);
 
-            //Link to health/stamina bars
+            //Link to UI elements
             healthBar = GameObject.FindGameObjectWithTag("HealthBar");
             staminaBar = GameObject.FindGameObjectWithTag("StaminaBar");
+
+            //Spawn crosshair
+            GameObject crosshairObj = Instantiate(crosshairPrefab, Vector3.zero, Quaternion.identity);
+            crosshair = crosshairObj.GetComponent<Crosshair> ();
         }
     }
 
@@ -155,7 +164,9 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 
         //Player input and movement
         getPlayerInput();
+        executePlayerActions();
         applyPlayerMovement();
+        setPlayerFacing();
 
         //Change the players velocity based on input
         if (canMove) {
@@ -254,7 +265,23 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         inputMoveY = Input.GetAxis("Vertical");
         inputJump = Input.GetButtonDown("Jump");
         inputDown = Input.GetButtonDown("Down");
+        inputAim = Input.GetButton("Aim");
         inputSprint = Input.GetButton("Sprint");
+        inputAttack = Input.GetButtonDown("Fire");
+    }
+
+    private void executePlayerActions() {
+        //Aiming
+        if (inputAim && grounded && !aiming) {
+            startAiming();
+        } else if (aiming && !inputAim) {
+            stopAiming();
+        }
+
+        //Attacking
+        if (inputAttack && grounded) {
+            attack();
+        }
     }
 
     private void applyPlayerMovement() {
@@ -262,6 +289,9 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         if (canMove) {
             //Horizontal movement
             if (grounded) {
+                //Apply movement speed modifiers
+                calculateCurrentMoveSpeed();
+
                 if (inputMoveX > 0.0f) {
                     velocity.x = currentMoveSpeed;
                 } else if (inputMoveX < 0.0f) {
@@ -270,7 +300,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
                     velocity.x = 0.0f;
                 }
                 //Sprinting
-                if (velocity.x != 0.0f && inputSprint) {
+                if (velocity.x != 0.0f && inputSprint && !aiming) {
                     if (currentStamina > 0.0f) {
                         sprinting = true;
                         velocity.x = velocity.x * sprintMultiplier;
@@ -306,8 +336,19 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
             } else {
                 gameObject.layer = 8;
             }
+        }
+    }
 
-            //Facing
+    private void setPlayerFacing() {
+        //Aiming Facing
+        if (aiming) {
+            if (crosshair.gameObject.transform.position.x > transform.position.x && !facingRight) {
+                Flip();
+            } else if (crosshair.gameObject.transform.position.x < transform.position.x && facingRight) {
+                Flip();
+            }
+        } else {
+            //Movement facing
             if (velocity.x > 0 && !facingRight) {
                 Flip();
             } else if (velocity.x < 0 && facingRight) {
@@ -319,6 +360,42 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 
     private void stopMovement() {
         rigidBody.velocity = new Vector2 (0.0f, 0.0f);
+    }
+
+    private void startAiming() {
+        aiming = true;
+        crosshair.gameObject.GetComponent<SpriteRenderer> ().enabled = true;
+    }
+
+    private void stopAiming() {
+        aiming = false;
+        crosshair.gameObject.GetComponent<SpriteRenderer> ().enabled = false;
+    }
+
+    private void attack() {
+        //TODO check attack type
+        //Ranged attacks
+        if (!aiming) {
+            return;
+        }
+        rangedAttack();
+
+        //Melee attacks
+    }
+
+    private void rangedAttack() {
+        //Animate the attack
+        animator.SetBool("RangedAttack", true);
+
+        float range = Mathf.Infinity;
+        LayerMask mask = LayerMask.GetMask("Enemies", "Terrain");
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, crosshair.gameObject.transform.position - transform.position, range, mask);
+        if (hit.collider != null) {
+            GameObject targetHit = hit.collider.gameObject;
+            if (targetHit.tag == "Enemy") {
+                targetHit.GetComponent<EnemyController> ().takeHit();
+            }
+        }
     }
 
     private void Flip()
@@ -364,6 +441,13 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 
     private void killSurvivor() {
         Debug.Log("You're Dead.");
+    }
+
+    private void calculateCurrentMoveSpeed() {
+        currentMoveSpeed = moveSpeed;
+        if (aiming) {
+            currentMoveSpeed *= aimSpeedMultiplier;
+        }
     }
 
 

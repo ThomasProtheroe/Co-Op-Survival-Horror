@@ -11,6 +11,8 @@ TagManager:
   - LobbyPlayerSlot
   - HealthBar
   - StaminaBar
+  - Crosshair
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -31,7 +33,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Background
   - 
   - 
   - 
@@ -48,18 +50,21 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Foreground
-    uniqueID: 1787769855
-    locked: 0
-  - name: Effects
-    uniqueID: 3547384485
-    locked: 0
-  - name: Players
-    uniqueID: 2953915365
+  - name: Background
+    uniqueID: 1324665265
     locked: 0
   - name: Enemies
     uniqueID: 1669320343
     locked: 0
-  - name: Background
-    uniqueID: 1324665265
+  - name: Players
+    uniqueID: 2953915365
+    locked: 0
+  - name: Effects
+    uniqueID: 3547384485
+    locked: 0
+  - name: Foreground
+    uniqueID: 1787769855
+    locked: 0
+  - name: UI
+    uniqueID: 505039415
     locked: 0

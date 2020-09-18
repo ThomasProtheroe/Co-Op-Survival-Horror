@@ -76,8 +76,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1341051931
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 0920242950484bf4983475ad11410a9e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -168,14 +168,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02e20746944b9814281af00f360d048d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 2
   maxHp: 100
   maxStamina: 100
   staminaRecoveryDelay: 3
   staminaRecoveryRate: 10
   jumpStaminaUsage: 20
   sprintStaminaUsage: 10
+  moveSpeed: 2
   sprintMultiplier: 1.6
+  aimSpeedMultiplier: 0.5
   fallMultiplier: 2.8
   fallControlSpeed: 2
   fallDamageThreshold: 12
@@ -183,8 +184,7 @@ MonoBehaviour:
   verticalJumpStrength: 5
   horizontalJumpStrength: 1.4
   landingStaggerTime: 0.5
-  healthBar: {fileID: 0}
-  staminaBar: {fileID: 0}
+  crosshairPrefab: {fileID: 7551344303545095689, guid: b9f2f3d2793ec654b9147a0b8e8c2634, type: 3}
 --- !u!114 &1673222894635344265
 MonoBehaviour:
   m_ObjectHideFlags: 0
