@@ -10,6 +10,8 @@ public class RangedWeapon : Weapon
     private int ammoCapacity;
     [SerializeField]
     private int reserveAmmoCapacity;
+    [SerializeField]
+    private float reloadTime;
 
 
     #region private fields
@@ -28,27 +30,26 @@ public class RangedWeapon : Weapon
         currentReserveAmmo = reserveAmmoCapacity;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    public Attack fireWeapon() {
+    public override Attack prepAttack() {
         if (currentAmmo <= 0) {
             return null;
         }
 
         currentAmmo -= 1;
 
-        Attack attack = new Attack();
-        attack.damage = damage;
-        attack.range = range;
-        attack.armorPiercing = armorPiercing;
-        attack.punchThrough = punchThrough;
-        attack.knockBack = knockback;
+        return base.prepAttack();
+    }
 
-        return attack;
+    public override void makeAttack(Attack attack) {
+        LayerMask mask = LayerMask.GetMask("Enemies", "Terrain");
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, attack.direction, attack.range, mask);
+        if (hit.collider != null) {
+            GameObject targetHit = hit.collider.gameObject;
+            if (targetHit.tag == "Enemy") {
+                targetHit.GetComponent<EnemyController> ().takeHit(attack);
+            }
+        }
+        Debug.Log("Shot fired - " + getCurrentAmmo() + " rounds left in the magazine.");
     }
 
     public void reloadWeapon() {

@@ -96,6 +96,8 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     private bool inputDown;
     private bool inputAim;
     private bool inputAttack;
+    private bool inputSwap;
+    private bool inputUse;
     private bool inputReload;
 
     //Timers
@@ -109,9 +111,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 
     [Header("Gear")]
     [SerializeField]
-    private Weapon weapon1;
-    [SerializeField]
-    private Weapon weapon2;
+    private List<Weapon> weapons;
     [SerializeField]
     private Armor armor;
 
@@ -140,7 +140,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         currentStamina = maxStamina;
         currentMoveSpeed = moveSpeed;
 
-        currentWeapon = weapon1;
+        currentWeapon = weapons[0];
 
         if (photonView.IsMine == true) {
             //Follow with camera
@@ -275,11 +275,11 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         inputMoveX = Input.GetAxis("Horizontal");
         inputMoveY = Input.GetAxis("Vertical");
         inputJump = Input.GetButtonDown("Jump");
-        inputDown = Input.GetButtonDown("Down");
         inputAim = Input.GetButton("Aim");
         inputSprint = Input.GetButton("Sprint");
         inputAttack = Input.GetButtonDown("Fire");
         inputReload = Input.GetButtonDown("Reload");
+        inputSwap = Input.GetButtonDown("Swap");
     }
 
     private void executePlayerActions() {
@@ -298,6 +298,10 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         if (inputReload && grounded) {
             stopAiming();
             reloadWeapon();
+        }
+
+        if (inputSwap) {
+            swapWeapon();
         }
     }
 
@@ -404,7 +408,28 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
             rangedAttack();
         } else {
             //Melee attacks
+            meleeAttack();
         }
+    }
+
+    private void meleeAttack() {
+        //Animate the attack
+        animator.SetBool("MeleeAttack", true);
+
+        var weapon = (MeleeWeapon)currentWeapon;
+        //Handle stamina consumption
+        //TODO - prevent attack if at 0 stamina
+        float staminaConsumption = weapon.getStaminaConsumption();
+        reduceStamina(staminaConsumption);
+
+        Attack attack = weapon.prepAttack();
+        if (attack == null) {
+            Debug.Log("Can't attack!");
+            return;
+        }
+
+        //Process attack object and pass back to weapon to make the actual attack
+        weapon.makeAttack(attack);
     }
 
     private void rangedAttack() {
@@ -412,21 +437,15 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         animator.SetBool("RangedAttack", true);
 
         var weapon = (RangedWeapon)currentWeapon;
-        Attack attack = weapon.fireWeapon();
+        Attack attack = weapon.prepAttack();
         if (attack == null) {
             Debug.Log("Gun empty!");
             return;
         }
+        attack.direction = crosshair.gameObject.transform.position - weapon.transform.position;
 
-        LayerMask mask = LayerMask.GetMask("Enemies", "Terrain");
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, crosshair.gameObject.transform.position - transform.position, attack.range, mask);
-        if (hit.collider != null) {
-            GameObject targetHit = hit.collider.gameObject;
-            if (targetHit.tag == "Enemy") {
-                targetHit.GetComponent<EnemyController> ().takeHit(attack);
-            }
-        }
-        Debug.Log("Shot fired - " + weapon.getCurrentAmmo() + " rounds left in the magazine.");
+        //Process attack object and pass back to weapon to make the actual attack
+        weapon.makeAttack(attack);
     }
     
     private void reloadWeapon() {
@@ -438,6 +457,16 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 
         var weapon = (RangedWeapon)currentWeapon;
         weapon.reloadWeapon();
+    }
+
+    private void swapWeapon() {
+        int nextWeapon = weapons.IndexOf(currentWeapon) + 1;
+        if (nextWeapon < weapons.Count) {
+            currentWeapon = weapons[nextWeapon];
+        } else {
+            currentWeapon = weapons[0];
+        }
+        Debug.Log("Swapping to " + currentWeapon.getWeaponName());
     }
 
     private void Flip()
@@ -547,4 +576,5 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     #endregion
+
 }
