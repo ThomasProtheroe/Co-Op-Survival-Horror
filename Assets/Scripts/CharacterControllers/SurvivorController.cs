@@ -99,6 +99,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     private bool inputSwap;
     private bool inputUse;
     private bool inputReload;
+    private bool inputAbility;
 
     //Timers
     private float landingStaggerTimer;
@@ -280,6 +281,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         inputAttack = Input.GetButtonDown("Fire");
         inputReload = Input.GetButtonDown("Reload");
         inputSwap = Input.GetButtonDown("Swap");
+        inputAbility = Input.GetButtonDown("Ability");
     }
 
     private void executePlayerActions() {
@@ -302,6 +304,11 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (inputSwap) {
             swapWeapon();
+        }
+
+        if (inputAbility)
+        {
+            triggerAbility();
         }
     }
 
@@ -447,8 +454,13 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         //Process attack object and pass back to weapon to make the actual attack
         weapon.makeAttack(attack);
     }
-    
-    private void reloadWeapon() {
+
+    private virtual void triggerAbility()
+    {
+        return;
+        }
+
+        private void reloadWeapon() {
         if (currentWeapon.getWeaponType() != 1) {
             return;
         }
