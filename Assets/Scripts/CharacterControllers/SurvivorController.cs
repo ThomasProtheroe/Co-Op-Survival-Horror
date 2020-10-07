@@ -455,7 +455,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         weapon.makeAttack(attack);
     }
 
-    private virtual void triggerAbility()
+    protected virtual void triggerAbility()
     {
         return;
         }
