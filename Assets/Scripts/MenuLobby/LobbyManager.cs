@@ -38,6 +38,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private PlayerLobbyInfo localSlot;
     private List<Player> playerList;
+    private ExitGames.Client.Photon.Hashtable hash;
 
     #endregion
 
@@ -60,6 +61,13 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IPunObservable
         } else {
             readyButton.SetActive(true);
         }
+
+        //Set the loadout for the local player
+        hash = new ExitGames.Client.Photon.Hashtable();
+        hash.Add("weapon1", "Handgun");
+        hash.Add("weapon2", "Knife");
+        hash.Add("armor", "Kevlar Vest");
+        PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
     }
 
 
@@ -80,12 +88,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         localSlot.toggleReadyStatus();
-
-        /*
-        foreach (Player player in playerList) {
-            Debug.Log("Player " + playerList.IndexOf(player) + " - " + player.NickName);
-        }
-        */
     }
 
     public void startClick() {

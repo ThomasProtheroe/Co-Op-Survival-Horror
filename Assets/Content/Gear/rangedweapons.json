@@ -1,0 +1,32 @@
+[
+    {
+        "weaponName":"Handgun",
+        "attributes":{
+            "damage":10,
+            "armorPiercing":0,
+            "punchThrough":0,
+            "knockback": 0,
+            "range":50,
+            "attackDelay":0,
+            "ammoCapacity":12,
+            "reserveAmmoCapacity":50,
+            "reloadTime":2.0
+        },
+        "classes": []
+    },
+    {
+        "weaponName":"Shotgun",
+        "attributes":{
+            "damage":50,
+            "armorPiercing":0,
+            "punchThrough":4,
+            "knockback": 2,
+            "range":15,
+            "attackDelay":0,
+            "ammoCapacity":6,
+            "reserveAmmoCapacity":20,
+            "reloadTime":4.5
+        },
+        "classes": ["tank"]
+    }
+]

@@ -141,8 +141,6 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         currentStamina = maxStamina;
         currentMoveSpeed = moveSpeed;
 
-        currentWeapon = weapons[0];
-
         if (photonView.IsMine == true) {
             //Follow with camera
             cameraController.startFollowing(gameObject);
@@ -455,7 +453,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         weapon.makeAttack(attack);
     }
 
-    private virtual void triggerAbility()
+    protected virtual void triggerAbility()
     {
         return;
         }
@@ -539,6 +537,42 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         }
         if (aiming) {
             currentMoveSpeed *= aimSpeedMultiplier;
+        }
+    }
+
+    public void addWeapon(Dictionary<string, float> weaponDict) {
+        if (weaponDict["weaponType"] == 1.0f) {
+            addRangedWeapon(weaponDict);
+        } else if (weaponDict["weaponType"] == 0f) {
+            addMeleeWeapon(weaponDict);
+        }
+    }
+
+    private void addRangedWeapon(Dictionary<string, float> weaponDict) {
+        GameObject weaponObj = new GameObject();
+        weaponObj.name = "Weapon";
+        weaponObj.transform.parent = this.gameObject.transform;
+
+        RangedWeapon newWeapon = weaponObj.AddComponent<RangedWeapon> ();
+        newWeapon.loadAttributes(weaponDict);
+        weapons.Add(newWeapon);
+
+        if (currentWeapon == null) {
+            currentWeapon = newWeapon;
+        }
+    }
+
+    private void addMeleeWeapon(Dictionary<string, float> weaponDict) {
+        GameObject weaponObj = new GameObject();
+        weaponObj.name = "Weapon";
+        weaponObj.transform.parent = this.gameObject.transform;
+
+        MeleeWeapon newWeapon = weaponObj.AddComponent<MeleeWeapon> ();
+        newWeapon.loadAttributes(weaponDict);
+        weapons.Add(newWeapon);
+
+        if (currentWeapon == null) {
+            currentWeapon = newWeapon;
         }
     }
 

@@ -15,7 +15,7 @@ public class Tank : SurvivorController
     {
         
     }
-    private override void triggerAbility()
+    protected override void triggerAbility()
     {
         return;
     }

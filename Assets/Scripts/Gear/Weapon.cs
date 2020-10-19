@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -50,6 +52,43 @@ public class Weapon : MonoBehaviour
 
     public virtual void makeAttack(Attack attack) {
         return;
+    }
+
+    public void loadAttributes(Dictionary<string, float> weaponDict) {
+        foreach(KeyValuePair<string, float> entry in weaponDict) {
+            FieldInfo tempField = this.GetType().GetField(entry.Key, BindingFlags.Instance | BindingFlags.NonPublic);
+            if (tempField.FieldType == typeof(System.Single)) {
+                tempField.SetValue(this, (float)entry.Value);
+            } else if (tempField.FieldType == typeof(System.Int32)) {
+                tempField.SetValue(this, (int)entry.Value);
+            }
+            
+            /*
+            switch(entry.Key) {
+                case "damage":
+                    this.damage = (int)entry.Value;
+                    break;
+                case "armorPiercing":
+                    this.damage = (int)entry.Value;
+                    break;
+                case "punchThrough":
+                    this.damage = (int)entry.Value;
+                    break;
+                case "knockback":
+                    this.damage = (int)entry.Value;
+                    break;
+                case "range":
+                    this.damage = (int)entry.Value;
+                    break;
+                case "attackDelay":
+                    this.damage = (int)entry.Value;
+                    break;
+                case "damage":
+                    this.damage = (int)entry.Value;
+                    break;
+            }
+            */
+        }
     }
 
     public int getWeaponType() {

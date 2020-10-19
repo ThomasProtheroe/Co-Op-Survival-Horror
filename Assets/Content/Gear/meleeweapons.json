@@ -1,0 +1,30 @@
+[
+    {
+        "weaponName":"Knife",
+        "attributes":{
+            "damage":15,
+            "armorPiercing":10,
+            "punchThrough":0,
+            "knockback":1,
+            "range":0.3,
+            "attackDelay":1,
+            "staminaConsumption":10,
+            "hitboxHeight":0.25
+        },
+        "classes": []
+    },
+    {
+        "weaponName":"Sledgehammer",
+        "attributes":{
+            "damage":40,
+            "armorPiercing":20,
+            "punchThrough":3,
+            "knockback":5,
+            "range":0.6,
+            "attackDelay":2,
+            "staminaConsumption":25,
+            "hitboxHeight":0.5
+        },
+        "classes": ["tank"]
+    }
+]

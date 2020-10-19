@@ -82,6 +82,7 @@ public class PlayerLobbyInfo : MonoBehaviourPunCallbacks, IPunObservable
 
     [PunRPC]
     void updatePlayerReadyStatus(bool ready) {
+        isReady = ready;
         if (ready) {
             playerReadyText.GetComponent<Text> ().enabled = true;
         } else {
