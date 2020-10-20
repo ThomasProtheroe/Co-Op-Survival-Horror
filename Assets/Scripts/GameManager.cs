@@ -46,8 +46,9 @@ public class GameManager : MonoBehaviourPunCallbacks
                 //Set players gear from custom player properties
                 Dictionary<string,float> weaponDict1 = Armory.getWeapon((string)PhotonNetwork.LocalPlayer.CustomProperties["weapon1"]);
                 Dictionary<string,float> weaponDict2 = Armory.getWeapon((string)PhotonNetwork.LocalPlayer.CustomProperties["weapon2"]);
-                newSurvivor.GetComponent<SurvivorController> ().addWeapon(weaponDict1);
-                newSurvivor.GetComponent<SurvivorController> ().addWeapon(weaponDict2);
+
+                newSurvivor.GetComponent<SurvivorController> ().addWeapon((string)PhotonNetwork.LocalPlayer.CustomProperties["weapon1"], weaponDict1);
+                newSurvivor.GetComponent<SurvivorController> ().addWeapon((string)PhotonNetwork.LocalPlayer.CustomProperties["weapon2"], weaponDict2);
             } else {
                 Debug.LogFormat("Do not instantiate player for scene load {0}", SceneManagerHelper.ActiveSceneName);
             }

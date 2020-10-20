@@ -55,6 +55,7 @@ public class Weapon : MonoBehaviour
     }
 
     public void loadAttributes(Dictionary<string, float> weaponDict) {
+        Debug.Log(weaponDict);
         foreach(KeyValuePair<string, float> entry in weaponDict) {
             FieldInfo tempField = this.GetType().GetField(entry.Key, BindingFlags.Instance | BindingFlags.NonPublic);
             if (tempField.FieldType == typeof(System.Single)) {
@@ -97,6 +98,10 @@ public class Weapon : MonoBehaviour
 
     public string getWeaponName() {
         return weaponName;
+    }
+
+    public void setWeaponName(string weaponName) {
+        this.weaponName = weaponName;
     }
 
     public bool isReady() {

@@ -186,9 +186,7 @@ MonoBehaviour:
   horizontalJumpStrength: 1.4
   landingStaggerTime: 0.5
   crosshairPrefab: {fileID: 7551344303545095689, guid: b9f2f3d2793ec654b9147a0b8e8c2634, type: 3}
-  weapons:
-  - {fileID: 0}
-  - {fileID: 0}
+  weapons: []
   armor: {fileID: 9138529320292828450}
 --- !u!114 &1673222894635344265
 MonoBehaviour:

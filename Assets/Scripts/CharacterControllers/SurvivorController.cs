@@ -540,21 +540,22 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    public void addWeapon(Dictionary<string, float> weaponDict) {
+    public void addWeapon(string weaponName, Dictionary<string, float> weaponDict) {
         if (weaponDict["weaponType"] == 1.0f) {
-            addRangedWeapon(weaponDict);
+            addRangedWeapon(weaponName, weaponDict);
         } else if (weaponDict["weaponType"] == 0f) {
-            addMeleeWeapon(weaponDict);
+            addMeleeWeapon(weaponName, weaponDict);
         }
     }
 
-    private void addRangedWeapon(Dictionary<string, float> weaponDict) {
+    private void addRangedWeapon(string weaponName, Dictionary<string, float> weaponDict) {
         GameObject weaponObj = new GameObject();
         weaponObj.name = "Weapon";
         weaponObj.transform.parent = this.gameObject.transform;
 
         RangedWeapon newWeapon = weaponObj.AddComponent<RangedWeapon> ();
         newWeapon.loadAttributes(weaponDict);
+        newWeapon.setWeaponName(weaponName);
         weapons.Add(newWeapon);
 
         if (currentWeapon == null) {
@@ -562,13 +563,14 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    private void addMeleeWeapon(Dictionary<string, float> weaponDict) {
+    private void addMeleeWeapon(string weaponName, Dictionary<string, float> weaponDict) {
         GameObject weaponObj = new GameObject();
         weaponObj.name = "Weapon";
         weaponObj.transform.parent = this.gameObject.transform;
 
         MeleeWeapon newWeapon = weaponObj.AddComponent<MeleeWeapon> ();
         newWeapon.loadAttributes(weaponDict);
+        newWeapon.setWeaponName(weaponName);
         weapons.Add(newWeapon);
 
         if (currentWeapon == null) {
