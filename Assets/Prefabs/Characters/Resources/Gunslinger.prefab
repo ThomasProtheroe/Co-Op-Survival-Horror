@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 2741495649838020841}
   - component: {fileID: 8837791874724511479}
   m_Layer: 8
-  m_Name: Player
+  m_Name: Gunslinger
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -169,6 +169,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02e20746944b9814281af00f360d048d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  characterName: 
+  className: Gunslinger
   maxHp: 100
   maxStamina: 100
   staminaRecoveryDelay: 3
@@ -185,9 +187,9 @@ MonoBehaviour:
   verticalJumpStrength: 5
   horizontalJumpStrength: 1.4
   landingStaggerTime: 0.5
-  crosshairPrefab: {fileID: 7551344303545095689, guid: b9f2f3d2793ec654b9147a0b8e8c2634, type: 3}
   weapons: []
   armor: {fileID: 9138529320292828450}
+  crosshairPrefab: {fileID: 7551344303545095689, guid: b9f2f3d2793ec654b9147a0b8e8c2634, type: 3}
 --- !u!114 &1673222894635344265
 MonoBehaviour:
   m_ObjectHideFlags: 0

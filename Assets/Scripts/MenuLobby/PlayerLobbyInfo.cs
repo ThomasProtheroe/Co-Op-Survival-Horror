@@ -30,6 +30,10 @@ public class PlayerLobbyInfo : MonoBehaviourPunCallbacks, IPunObservable
         
     }
 
+    private void enableCharacterSelection() {
+        
+    }
+
 
     #region IPunObservable implementation
 
@@ -43,6 +47,7 @@ public class PlayerLobbyInfo : MonoBehaviourPunCallbacks, IPunObservable
     public void loadPlayer() {
         //Load the player info for all clients
         photonView.RPC("updatePlayerInfo", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
+        enableCharacterSelection();
     }
 
     public void unloadPlayer() {

@@ -12,10 +12,14 @@ public class MainMenuController : MonoBehaviour
     private GameObject hostGamePanel;
     [SerializeField]
     private GameObject joinGamePanel;
+    [SerializeField]
+    private GameObject loadoutPanel;
 
     // Start is called before the first frame update
     void Start()
     {
+        Armory.loadGear();
+        CharacterManager.loadAllCharacters();
         showMainMenu();
     }
 
@@ -41,6 +45,14 @@ public class MainMenuController : MonoBehaviour
 
     public void hideJoinMenu() {
         joinGamePanel.SetActive(false);
+    }
+
+    public void showLoadoutMenu() {
+        loadoutPanel.SetActive(true);
+    }
+
+    public void hideLoadoutMenu() {
+        loadoutPanel.SetActive(false);
     }
 
     public void quitGame() {

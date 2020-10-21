@@ -13,6 +13,10 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     #region Private Serializable Fields
 
     [SerializeField]
+    private string characterName;
+    [SerializeField]
+    private string className;
+    [SerializeField]
     private int maxHp;
     [SerializeField]
     private float maxStamina;
@@ -44,6 +48,16 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     private float horizontalJumpStrength;
     [SerializeField]
     private float landingStaggerTime;
+
+    #endregion
+
+    #region Gear
+
+    [Header("Gear")]
+    [SerializeField]
+    private List<Weapon> weapons;
+    [SerializeField]
+    private Armor armor;
 
     #endregion
 
@@ -104,17 +118,6 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     //Timers
     private float landingStaggerTimer;
     private float staminaRecoveryTimer;
-
-    #endregion
-
-
-    #region Gear
-
-    [Header("Gear")]
-    [SerializeField]
-    private List<Weapon> weapons;
-    [SerializeField]
-    private Armor armor;
 
     #endregion
 
@@ -621,6 +624,14 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     //Getters/Setters
     public Vector2 getVelocity() {
         return rigidBody.velocity;
+    }
+
+    public string getCharacterName() {
+        return characterName;
+    }
+
+    public string getClassName() {
+        return className;
     }
 
     #endregion
