@@ -9,13 +9,9 @@ public static class CharacterManager
  {
     private static string savePath;
     private static List<Character> allCharacters;
-    private static string lastPlayedCharacterName;
+    private static Character currentCharacter;
     static CharacterManager() {
-        savePath = Application.persistentDataPath + "/characters/";
-
-        if (PlayerPrefs.HasKey("Last_Character")) {
-            lastPlayedCharacterName = PlayerPrefs.GetString("Last_Character");
-        }
+        savePath = Application.persistentDataPath + "/savedata/characters/";
     }
         
     /**
@@ -54,8 +50,29 @@ public static class CharacterManager
         }
     }
 
+    public static void createNewCharacter(string newCharacterName, string newCharacterClass) {
+        Character newCharacter = new Character();
+        newCharacter.characterName = newCharacterName;
+        newCharacter.className = newCharacterClass;
+        newCharacter.experience = 0;
+        newCharacter.level = 1;
+
+        //TODO - Set starting gear
+
+        saveCharacterToDisk(newCharacter);
+        allCharacters.Add(newCharacter);
+    }
+
     public static List<Character> getCharacters() {
         return allCharacters;
+    }
+
+    public static void setCurrentCharacter(Character character) {
+        currentCharacter = character;
+    }
+
+    public static Character getCurrentCharacter() {
+        return currentCharacter;
     }
 
     public static void debugPrintCharacterList() {

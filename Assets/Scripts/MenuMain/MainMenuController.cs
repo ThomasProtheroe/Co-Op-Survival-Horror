@@ -13,7 +13,7 @@ public class MainMenuController : MonoBehaviour
     [SerializeField]
     private GameObject joinGamePanel;
     [SerializeField]
-    private GameObject loadoutPanel;
+    private GameObject characterPanel;
 
     // Start is called before the first frame update
     void Start()
@@ -47,12 +47,12 @@ public class MainMenuController : MonoBehaviour
         joinGamePanel.SetActive(false);
     }
 
-    public void showLoadoutMenu() {
-        loadoutPanel.SetActive(true);
+    public void showCharacterMenu() {
+        characterPanel.SetActive(true);
     }
 
-    public void hideLoadoutMenu() {
-        loadoutPanel.SetActive(false);
+    public void hideCharacterMenu() {
+        characterPanel.SetActive(false);
     }
 
     public void quitGame() {
