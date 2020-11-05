@@ -9,15 +9,35 @@ public class CharacterMenuController : MonoBehaviour
     [SerializeField]
     private GameObject createCharacterPanel;
     [SerializeField]
-    private GameObject characterNameField;
+    private GameObject characterListPanel;
 
+    [SerializeField]
+    private List<CharacterInfo> characterInfos;
+    [SerializeField]
+    private GameObject characterInfoPrefab;
+
+    [SerializeField]
+    private GameObject characterNameField;
     [SerializeField]
     private GameObject characterClassField;
 
     private string characterName;
     
     public void loadCharacterList() {
-        
+        foreach(Transform child in characterListPanel.transform) {
+            Destroy(child.gameObject);
+        }
+        foreach(Character character in CharacterManager.getCharacters()) {
+            GameObject infoPanel = Instantiate(characterInfoPrefab, characterListPanel.transform);
+            CharacterInfo info = infoPanel.GetComponent<CharacterInfo> ();
+            info.loadCharacter(character);
+        }
+    }
+
+    public void updateSelectedCharacter() {
+        foreach(Transform child in characterListPanel.transform) {
+            child.gameObject.GetComponent<CharacterInfo> ().updateColor();
+        }
     }
     
     public void createNewCharacter() {
@@ -26,6 +46,8 @@ public class CharacterMenuController : MonoBehaviour
         string characterName = characterNameField.GetComponent<InputField> ().text;
 
         CharacterManager.createNewCharacter(characterName, characterClass);
+
+        loadCharacterList();
     }
 
     public void showCreateCharacterPanel() {

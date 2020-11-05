@@ -18,8 +18,10 @@ public static class CharacterManager
     * Saves the save data to the disk
     */
     public static void saveCharacterToDisk(Character character) {
+        string path = savePath + character.characterName + ".sav";
         BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(savePath + character.characterName + ".dat");
+        DirectoryInfo di = Directory.CreateDirectory(path);
+        FileStream file = File.Create(path);
         bf.Serialize(file, character);
         file.Close();
     }
