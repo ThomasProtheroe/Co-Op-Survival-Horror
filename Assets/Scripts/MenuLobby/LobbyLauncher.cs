@@ -111,30 +111,27 @@ public class LobbyLauncher : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        Debug.Log("PUN Basics Tutorial/Launcher: OnConnectedToMaster() was called by PUN");
         hostOrJoinLobby();
     }
 
 
     public override void OnDisconnected(DisconnectCause cause)
     {
-        Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
+        
     }
 
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
-        Debug.Log("Failed to join a room.");
+
     }
 
     public override void OnJoinedRoom()
     {
-        Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
         SceneManager.LoadScene(1);
     }
 
     public override void OnCreatedRoom()
     {
-        Debug.Log("PUN Basics Tutorial/Launcher: OnCreatedRoom() called by PUN.");
         SceneManager.LoadScene(1);
     }
 

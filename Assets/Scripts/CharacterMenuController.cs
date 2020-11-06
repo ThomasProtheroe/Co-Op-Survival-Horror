@@ -31,12 +31,7 @@ public class CharacterMenuController : MonoBehaviour
             GameObject infoPanel = Instantiate(characterInfoPrefab, characterListPanel.transform);
             CharacterInfo info = infoPanel.GetComponent<CharacterInfo> ();
             info.loadCharacter(character);
-        }
-    }
-
-    public void updateSelectedCharacter() {
-        foreach(Transform child in characterListPanel.transform) {
-            child.gameObject.GetComponent<CharacterInfo> ().updateColor();
+            info.updateColor();
         }
     }
     

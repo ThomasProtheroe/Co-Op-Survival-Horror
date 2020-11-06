@@ -178,7 +178,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 2741495649838020841}
   - {fileID: 8837791874724511479}
-  - {fileID: 0}
+  - {fileID: 8990446784782196114}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -250,8 +250,8 @@ MonoBehaviour:
   staminaRecoveryRate: 7
   jumpStaminaUsage: 25
   sprintStaminaUsage: 15
-  moveSpeed: 1
-  sprintMultiplier: 1.2
+  moveSpeed: 1.6
+  sprintMultiplier: 1.6
   aimSpeedMultiplier: 0.5
   fallMultiplier: 2.8
   fallControlSpeed: 2

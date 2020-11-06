@@ -41,8 +41,10 @@ public class CharacterInfo : MonoBehaviour
     }
 
     private void makeActiveCharacter() {
-        Debug.Log("Active Character: " + character.characterName);
         CharacterManager.setCurrentCharacter(character);
-        updateColor();
+        PlayerPrefs.SetString("current_character", character.characterName);
+        foreach(GameObject temp in GameObject.FindGameObjectsWithTag("CharacterInfo")) {
+            temp.GetComponent<CharacterInfo> ().updateColor();
+        }
     }
 }

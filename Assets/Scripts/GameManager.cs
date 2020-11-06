@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     #region Private Serializable References
 
     [SerializeField]
-    private GameObject playerPrefab;
+    private List<GameObject> playerPrefabs;
     [SerializeField]
     private List<GameObject> playerSpawns;
 
@@ -33,22 +33,22 @@ public class GameManager : MonoBehaviourPunCallbacks
         //Get player spawn locations
         playerSpawns = new List<GameObject> (GameObject.FindGameObjectsWithTag("PlayerSpawn"));
         playerList = new List<Player> (PhotonNetwork.PlayerList);
+        Character currentCharacter = CharacterManager.getCurrentCharacter();
+        GameObject classPrefab = playerPrefabs[currentCharacter.classType];
 
-        if (playerPrefab == null) {
+        if (classPrefab == null) {
             Debug.LogError("<Color=Red><a>Missing</a></Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'",this);
         } else {
             if (SurvivorController.localPlayerInstance == null) {
                 // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
                 //Select a spawn location based on the players number (index in playerList)
                 Vector3 spawnLocation = playerSpawns[playerList.IndexOf(PhotonNetwork.LocalPlayer)].transform.position;
-                GameObject newSurvivor = PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(spawnLocation.x, spawnLocation.y, 0.0f), Quaternion.identity, 0);
+                GameObject newSurvivor = PhotonNetwork.Instantiate(classPrefab.name, new Vector3(spawnLocation.x, spawnLocation.y, 0.0f), Quaternion.identity, 0);
                 
-                //Set players gear from custom player properties
-                Dictionary<string,float> weaponDict1 = Armory.getWeapon((string)PhotonNetwork.LocalPlayer.CustomProperties["weapon1"]);
-                Dictionary<string,float> weaponDict2 = Armory.getWeapon((string)PhotonNetwork.LocalPlayer.CustomProperties["weapon2"]);
-
-                newSurvivor.GetComponent<SurvivorController> ().addWeapon((string)PhotonNetwork.LocalPlayer.CustomProperties["weapon1"], weaponDict1);
-                newSurvivor.GetComponent<SurvivorController> ().addWeapon((string)PhotonNetwork.LocalPlayer.CustomProperties["weapon2"], weaponDict2);
+                //Set players gear from character data
+                foreach(string weapon in CharacterManager.getCurrentCharacter().weapons) {
+                    newSurvivor.GetComponent<SurvivorController> ().addWeapon(weapon);
+                }
             } else {
                 Debug.LogFormat("Do not instantiate player for scene load {0}", SceneManagerHelper.ActiveSceneName);
             }

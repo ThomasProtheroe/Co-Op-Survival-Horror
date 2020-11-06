@@ -20,6 +20,7 @@ public class MainMenuController : MonoBehaviour
     {
         Armory.loadGear();
         CharacterManager.loadAllCharacters();
+        CharacterManager.loadCurrentCharacterFromPrefs();
         showMainMenu();
     }
 

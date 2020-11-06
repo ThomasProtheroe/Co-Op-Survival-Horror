@@ -903,6 +903,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4645367653074448858, guid: 06151464f9e69384e951c8955de9da31, type: 3}
+      propertyPath: playerPrefabs.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4645367653074448858, guid: 06151464f9e69384e951c8955de9da31, type: 3}
       propertyPath: playerSpawns.Array.data[0]
       value: 
       objectReference: {fileID: 387705200}
@@ -918,6 +922,14 @@ PrefabInstance:
       propertyPath: playerSpawns.Array.data[3]
       value: 
       objectReference: {fileID: 794028860}
+    - target: {fileID: 4645367653074448858, guid: 06151464f9e69384e951c8955de9da31, type: 3}
+      propertyPath: playerPrefabs.Array.data[1]
+      value: 
+      objectReference: {fileID: 1673222894635344240, guid: f5b37c6d1de10a143b1758c5fcc7d134, type: 3}
+    - target: {fileID: 4645367653074448858, guid: 06151464f9e69384e951c8955de9da31, type: 3}
+      propertyPath: playerPrefabs.Array.data[0]
+      value: 
+      objectReference: {fileID: 1673222894635344240, guid: 2a46db8a145ceac41b159882eaf3a9ca, type: 3}
     - target: {fileID: 5748040251255574872, guid: 06151464f9e69384e951c8955de9da31, type: 3}
       propertyPath: m_LocalPosition.x
       value: 341.43018

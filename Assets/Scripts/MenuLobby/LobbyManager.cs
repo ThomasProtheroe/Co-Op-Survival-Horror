@@ -62,12 +62,10 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IPunObservable
             readyButton.SetActive(true);
         }
 
-        //Set the loadout for the local player
-        hash = new ExitGames.Client.Photon.Hashtable();
-        hash.Add("weapon1", "Handgun");
-        hash.Add("weapon2", "Knife");
-        hash.Add("armor", "Kevlar Vest");
-        PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+        Character currentCharacter = CharacterManager.getCurrentCharacter();
+        currentCharacter.addWeapon("Handgun");
+        currentCharacter.addWeapon("Knife");
+        currentCharacter.addArmor("Kevlar Vest");
     }
 
 
@@ -128,7 +126,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             Debug.LogError("PhotonNetwork : Trying to Load a level but we are not the master Client");
         }
-        Debug.LogFormat("PhotonNetwork : Loading Level : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
         PhotonNetwork.LoadLevel("RandomLevel");
     }
 

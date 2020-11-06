@@ -134,6 +134,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("Called Start function");
         //Set references
         rigidBody = GetComponent<Rigidbody2D> ();
         cameraController = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController> ();
@@ -208,7 +209,7 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
                 startStaminaRecovery();
             } 
         }
-        
+
         //More responsive jumps
         if (rigidBody.velocity.y < 0) {
             rigidBody.gravityScale = fallMultiplier;
@@ -543,7 +544,8 @@ public class SurvivorController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    public void addWeapon(string weaponName, Dictionary<string, float> weaponDict) {
+    public void addWeapon(string weaponName) {
+        Dictionary<string, float> weaponDict = Armory.getWeapon(weaponName);
         if (weaponDict["weaponType"] == 1.0f) {
             addRangedWeapon(weaponName, weaponDict);
         } else if (weaponDict["weaponType"] == 0f) {
